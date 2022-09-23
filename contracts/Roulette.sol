@@ -50,13 +50,22 @@ contract Roulete is VRFv2Consumer  , ReentrancyGuard{
         msg.sender.call{value:amount}('');
     }
     // Play choosing a color
-    function playColors(uint256 bet, uint256 color) external{
+     function playColors(uint256 bet, uint256 color) external{
+        require(betsOpen(), "Bets closed!");
         require(bet>0, "Invalid bet");
         require(color<3, "Invalid color");
         _burn(bet);
+        if(color==1){
+            bets.red.push(msg.sender);
+        }else if(color==2){
+            bets.black.push(msg.sender);
+        }else{
+            bets.green.push(msg.sender);
+        }
         lastBet[msg.sender] = bet;
 
     }
+    
     
     function _mint(uint256 _amount) internal{
         balanceOf[msg.sender]+=_amount;
