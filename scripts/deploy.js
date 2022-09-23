@@ -1,30 +1,31 @@
-// We require the Hardhat Runtime Environment explicitly here. This is optional
-// but useful for running the script in a standalone fashion through `node <script>`.
-//
-// You can also run a script with `npx hardhat run <script>`. If you do that, Hardhat
-// will compile your contracts, add the Hardhat Runtime Environment's members to the
-// global scope, and execute the script.
 const hre = require("hardhat");
 
-async function main() {
-  const currentTimestampInSeconds = Math.round(Date.now() / 1000);
-  const ONE_YEAR_IN_SECS = 365 * 24 * 60 * 60;
-  const unlockTime = currentTimestampInSeconds + ONE_YEAR_IN_SECS;
-
-  const lockedAmount = hre.ethers.utils.parseEther("1");
-
-  const Lock = await hre.ethers.getContractFactory("Lock");
-  const lock = await Lock.deploy(unlockTime, { value: lockedAmount });
-
-  await lock.deployed();
-
-  console.log(
-    `Lock with 1 ETH and unlock timestamp ${unlockTime} deployed to ${lock.address}`
-  );
+function toEther(n){
+  return hre.ethers.utils.parseUnits(n.toString(), "ether" )
 }
 
-// We recommend this pattern to be able to use async/await everywhere
-// and properly handle errors.
+async function main() {
+ const Roulette = hre.ethers.getContractFactory("Roulette")
+ const roulette = await Roulette.deploy(28)
+ const [deployer , p1, p2] = await hre.ethers.getSigners()
+
+ const deposits = toEther(0.5)
+
+ setInterval(async()=>{
+  const open = await roulette.betsOpen()
+  console.log(`UPDATE: Bets ${open?"open":"closed"}`)
+  if(!open){
+    console.log("Rolling in 3...")
+    console.log("Rolling in 2...")
+    console.log("Rolling in 1...")
+    console.log("Rolling")
+
+  }
+ },1000)
+ 
+}
+
+
 main().catch((error) => {
   console.error(error);
   process.exitCode = 1;
